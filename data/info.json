@@ -1,0 +1,45 @@
+{
+  "name": "Café Aroma",
+  "tagline": "The classic Aroma with a modern soul.",
+  "address": "55 Wall St, Norwalk, CT 06850",
+  "phone": "(203) 354-0677",
+  "phone_raw": "2033540677",
+  "email": "cafearoma55@hotmail.com",
+  "parking": "Free street parking until 6pm",
+  "amenities": ["Outdoor seating", "Free WiFi", "Apple Pay"],
+  "social": {
+    "instagram": "https://www.instagram.com/cafearoma55/",
+    "facebook":  "https://www.facebook.com/CafeAroma55/",
+    "yelp":      "https://www.yelp.com/biz/cafe-aroma-norwalk"
+  },
+  "hours": [
+    { "day": "Monday",    "open": "08:00", "close": "20:00", "display": "8:00 am – 8:00 pm" },
+    { "day": "Tuesday",   "open": "08:00", "close": "20:00", "display": "8:00 am – 8:00 pm" },
+    { "day": "Wednesday", "open": "08:00", "close": "20:00", "display": "8:00 am – 8:00 pm" },
+    { "day": "Thursday",  "open": "08:00", "close": "20:00", "display": "8:00 am – 8:00 pm" },
+    { "day": "Friday",    "open": "08:00", "close": "20:00", "display": "8:00 am – 8:00 pm" },
+    { "day": "Saturday",  "open": "08:30", "close": "20:00", "display": "8:30 am – 8:00 pm" },
+    { "day": "Sunday",    "open": "08:30", "close": "20:00", "display": "8:30 am – 8:00 pm" }
+  ],
+  "stats": [
+    { "num": "4.6★", "label": "237+ Reviews" },
+    { "num": "#2",   "label": "Coffee in Norwalk" },
+    { "num": "100%", "label": "Organic Milk" },
+    { "num": "∞",    "label": "Good Vibes" }
+  ],
+  "reviews": [
+    { "author": "Andy A.",      "source": "Yelp",        "text": "Best coffee, service impeccable. Clean with a simple ambiance. Everything prepared to order." },
+    { "author": "Sarah M.",     "source": "Google",      "text": "My iced caramel macchiato was delicious and my bf LOVED their croissants!! A must for any coffee lover visiting the area!" },
+    { "author": "Travel Guest", "source": "TripAdvisor", "text": "Superb pastries and the freddo espresso — so much better than the lunch we had in mind. The owner was very welcoming." },
+    { "author": "Family Visit", "source": "Google",      "text": "Espresso and lattes were perfect, and all the sweet treats were fantastic. Will definitely stop back after our next aquarium visit." },
+    { "author": "Regular",      "source": "Google",      "text": "Cakes and brownies are super good. Very cozy place. Staff super nice. Paul won't let you leave without trying the gelato — AMAZING!" }
+  ],
+  "values": [
+    { "title": "Lavazza Fresh Ground",    "desc": "Premium Italian coffee beans, ground fresh for every single cup." },
+    { "title": "Copper-Filtered Water",   "desc": "All drinks made with water filtered through copper pipes for purity." },
+    { "title": "Organic Milk Options",    "desc": "Whole, 2%, skim, almond, oat & coconut — all organic." },
+    { "title": "Organic Sugar & Stevia",  "desc": "Sweetness without compromise. Natural alternatives always available." },
+    { "title": "GMO Free Products",       "desc": "Everything we serve is thoughtfully sourced and free of GMOs." },
+    { "title": "Made to Order",           "desc": "Nothing sits under a lamp. Every drink and bite crafted on request." }
+  ]
+}

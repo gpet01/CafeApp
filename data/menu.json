@@ -1,0 +1,70 @@
+{
+  "hot": [
+    { "name": "Espresso",           "note": "Single / Double",                  "price": "$2.75 · $4.50",         "featured": false },
+    { "name": "Americano",          "note": "Single / Double",                  "price": "$3.00 · $4.75",         "featured": false },
+    { "name": "Cortado",            "note": "Single / Double",                  "price": "$3.25 · $5.00",         "featured": false },
+    { "name": "Macchiato",          "note": "Single / Double",                  "price": "$3.00 · $4.75",         "featured": false },
+    { "name": "Latte Macchiato",    "note": "Small / Medium",                   "price": "$3.50 · $5.25",         "featured": false },
+    { "name": "Caramel Macchiato",  "note": "Small / Medium",                   "price": "$4.00 · $5.75",         "featured": false },
+    { "name": "Cappuccino",         "note": "Small / Medium",                   "price": "$3.50 · $5.25",         "featured": false },
+    { "name": "Café Latte",         "note": "Small / Medium",                   "price": "$3.50 · $5.25",         "featured": false },
+    { "name": "Café Mocha",         "note": "Small / Medium",                   "price": "$4.00 · $5.75",         "featured": false },
+    { "name": "Brewed House",       "note": "Sm / Med / Lg",                    "price": "$2.50 · $3.00 · $3.50", "featured": false },
+    { "name": "Hot Tea",            "note": "Sm / Lg",                          "price": "$2.50 · $3.25",         "featured": false },
+    { "name": "Hot Chocolate",      "note": "w/ organic milk · Sm / Med / Lg", "price": "$3.75 · $4.25 · $4.75", "featured": true  },
+    { "name": "Café au Lait",       "note": "Sm / Med / Lg",                    "price": "$3.00 · $3.50 · $4.00", "featured": false },
+    { "name": "Nescafe",            "note": "",                                 "price": "$3.75",                 "featured": false }
+  ],
+  "iced": [
+    { "name": "Freddo Espresso",        "note": "16oz / 20oz — Our signature",  "price": "$5.00 · $7.00",         "featured": true  },
+    { "name": "Freddo Cappuccino",      "note": "20oz — Velvety cold foam",     "price": "$5.50",                 "featured": true  },
+    { "name": "Iced Café Latte",        "note": "16oz / 20oz",                  "price": "$5.25 · $7.25",         "featured": false },
+    { "name": "Iced Cappuccino",        "note": "16oz / 20oz",                  "price": "$5.25 · $7.25",         "featured": false },
+    { "name": "Iced Latte Macchiato",   "note": "16oz / 20oz",                  "price": "$5.25 · $7.25",         "featured": false },
+    { "name": "Iced Caramel Macchiato", "note": "16oz / 20oz",                  "price": "$5.75 · $7.75",         "featured": false },
+    { "name": "Iced Café Mocha",        "note": "16oz / 20oz",                  "price": "$5.75 · $7.75",         "featured": false },
+    { "name": "Iced Americano",         "note": "16oz / 20oz",                  "price": "$4.75 · $6.75",         "featured": false },
+    { "name": "Espresso Over Ice",      "note": "Single / Double",              "price": "$3.00 · $4.75",         "featured": false },
+    { "name": "Iced Brewed Coffee",     "note": "16oz / 20oz / 24oz",           "price": "$3.00 · $3.25 · $5.50", "featured": false },
+    { "name": "Iced Tea",               "note": "",                             "price": "$3.25",                 "featured": false },
+    { "name": "Iced Frappe",            "note": "",                             "price": "$3.75",                 "featured": false }
+  ],
+  "pastries": [
+    { "name": "Bagel",                "note": "Plain",               "price": "$2.50" },
+    { "name": "Bagel w/ Butter",      "note": "",                    "price": "$3.00" },
+    { "name": "Bagel w/ Cream Cheese","note": "",                    "price": "$3.50" },
+    { "name": "Croissant",            "note": "Buttery & flaky",     "price": "$3.50" },
+    { "name": "Croissant w/ Nutella", "note": "",                    "price": "$4.50" },
+    { "name": "Brownies",             "note": "",                    "price": "$3.50" },
+    { "name": "Cookies",              "note": "",                    "price": "$2.50" },
+    { "name": "Coffee Cake",          "note": "",                    "price": "$3.25" },
+    { "name": "Banana Bread",         "note": "",                    "price": "$3.25" }
+  ],
+  "savory": [
+    { "name": "Spinach Pie",      "note": "3 pieces", "price": "$6.00" },
+    { "name": "Feta Cheese Pie",  "note": "3 pieces", "price": "$5.25" }
+  ],
+  "gelato": [
+    { "name": "Bambino",        "note": "Small scoop",                "price": "$2.50" },
+    { "name": "Piccolo",        "note": "Medium",                     "price": "$4.50" },
+    { "name": "Medio",          "note": "Large",                      "price": "$6.50" },
+    { "name": "Affogato",       "note": "Espresso poured over gelato","price": "$7.75" },
+    { "name": "Yogurt Parfait", "note": "",                           "price": "$3.95" }
+  ],
+  "extras": [
+    { "name": "Shot of Espresso",  "price": "$2.00" },
+    { "name": "Flavored Syrups",   "price": "$0.50" },
+    { "name": "Honey",             "price": "$0.50" },
+    { "name": "Decaf Espresso",    "price": "+$0.50/shot" }
+  ],
+  "creamers": [
+    { "name": "Organic Whole",       "price": null },
+    { "name": "Organic 2%",          "price": null },
+    { "name": "Organic Skim",        "price": null },
+    { "name": "Organic Half & Half", "price": "+$1.00" },
+    { "name": "Organic Almond Milk", "price": null },
+    { "name": "Oat Milk",            "price": "+$0.50" },
+    { "name": "Coconut Milk",        "price": "+$0.50" }
+  ],
+  "syrups": ["Caramel", "Chocolate", "Hazelnut", "Vanilla", "Amaretto"]
+}
