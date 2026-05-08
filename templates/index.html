@@ -1,10 +1,253 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+
+{# ── Hero ── #}
+<section class="hero">
+  <div class="hero-tag">Est. Norwalk, Connecticut</div>
+  <h1 class="hero-title">Café <span>Aroma 55</span></h1>
+  <p class="hero-subtitle">{{ info.tagline }}</p>
+  <div class="hero-buttons">
+    <a href="#order-section" class="btn-primary">Order Ahead</a>
+    <a href="#visit" class="btn-secondary">Find Us</a>
+  </div>
+</section>
+
+{# ── Ticker ── #}
+{% set ticker = ["Fresh Ground Lavazza","Freddo Espresso","Homemade Gelato","Organic Ingredients","Outdoor Seating","Greek Family Owned","Norwalk's Hidden Gem","Open Mon – Sun"] %}
+<div class="strip">
+  <div class="strip-inner">
+    {% for _ in range(2) %}
+      {% for item in ticker %}<span class="strip-item">{{ item }}</span>{% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{# ── Gelato Banner ── #}
+<div class="gelato-banner">
+  <span class="gelato-label">🍦 Today's Flavors:</span>
+  {% for f in gelato %}
+    <span class="gelato-chip">{{ f }}</span>
+  {% endfor %}
+</div>
+
+{# ── About ── #}
+<section id="about">
+  <div class="section-header">
+    <div class="section-label">Our Story</div>
+    <h2>A classic café with a <em>modern soul</em></h2>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Café Aroma is a <strong>Greek family-owned</strong> neighborhood treasure at {{ info.address }}.
+         From the moment you walk in, you feel the warmth — the kind that comes from genuine passion
+         for good coffee and great hospitality.</p>
+      <p>Owner Paul and his family have built something rare: a place where locals feel at home and
+         visitors feel they've found a secret. Coffee is at the heart of everything — from silky
+         Lavazza espresso to the iconic <strong>Freddo</strong> that keeps everyone coming back.</p>
+    </div>
+    <div class="about-stats">
+      {% for stat in info.stats %}
+        <div class="stat-card">
+          <span class="stat-num">{{ stat.num }}</span>
+          <span class="stat-label">{{ stat.label }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ── Menu ── #}
+<section id="menu">
+  <div class="section-header">
+    <div class="section-label">What We Serve</div>
+    <h2>The <em>menu</em></h2>
+  </div>
+
+  {# Filter tabs #}
+  <div class="filter-tabs">
+    {% for label, tag in [("All","all"),("Hot","hot"),("Iced","iced"),("Pastries","pastry"),("Gelato","gelato"),("Savory","savory")] %}
+      <button class="filter-btn {% if loop.first %}active{% endif %}" data-filter="{{ tag }}">{{ label }}</button>
+    {% endfor %}
+  </div>
+
+  {# Hot #}
+  <div class="menu-section-title">☕ Hot Beverages</div>
+  {% for item in menu.hot %}
+    <div class="menu-row" data-tags="hot">
+      <span class="item-name">{{ item.name }}{% if item.note %} <span class="item-note">· {{ item.note }}</span>{% endif %}</span>
+      <span class="item-price {% if item.featured %}featured{% endif %}">{{ item.price }}</span>
+    </div>
+  {% endfor %}
+
+  {# Cold #}
+  <div class="menu-section-title">🧊 Cold Beverages</div>
+  {% for item in menu.iced %}
+    <div class="menu-row" data-tags="iced">
+      <span class="item-name">{{ item.name }}{% if item.note %} <span class="item-note">· {{ item.note }}</span>{% endif %}</span>
+      <span class="item-price {% if item.featured %}featured{% endif %}">{{ item.price }}</span>
+    </div>
+  {% endfor %}
+
+  {# Pastries + Savory #}
+  <div class="menu-section-title">🥐 Breads &amp; Pastries</div>
+  {% for item in menu.pastries %}
+    <div class="menu-row" data-tags="pastry">
+      <span class="item-name">{{ item.name }}{% if item.note %} <span class="item-note">· {{ item.note }}</span>{% endif %}</span>
+      <span class="item-price">{{ item.price }}</span>
+    </div>
+  {% endfor %}
+  {% for item in menu.savory %}
+    <div class="menu-row" data-tags="savory">
+      <span class="item-name">{{ item.name }}{% if item.note %} <span class="item-note">· {{ item.note }}</span>{% endif %}</span>
+      <span class="item-price">{{ item.price }}</span>
+    </div>
+  {% endfor %}
+
+  {# Gelato #}
+  <div class="menu-section-title">🍦 Gelato</div>
+  {% for item in menu.gelato %}
+    <div class="menu-row" data-tags="gelato">
+      <span class="item-name">{{ item.name }}{% if item.note %} <span class="item-note">· {{ item.note }}</span>{% endif %}</span>
+      <span class="item-price featured">{{ item.price }}</span>
+    </div>
+  {% endfor %}
+
+  {# Extras row #}
+  <div class="extras-grid">
+    <div class="extras-box">
+      <div class="extras-title">Extras</div>
+      {% for e in menu.extras %}
+        <div class="extras-row"><span>{{ e.name }}</span><strong>{{ e.price }}</strong></div>
+      {% endfor %}
+    </div>
+    <div class="extras-box">
+      <div class="extras-title">Creamers</div>
+      {% for c in menu.creamers %}
+        <div class="extras-row"><span>{{ c.name }}</span>{% if c.price %}<strong>{{ c.price }}</strong>{% endif %}</div>
+      {% endfor %}
+    </div>
+    <div class="extras-box">
+      <div class="extras-title">Organic Syrups</div>
+      <p style="color:var(--muted);font-size:13px;margin:0">{{ menu.syrups | join(" · ") }}</p>
+    </div>
+  </div>
+</section>
+
+{# ── Reviews ── #}
+<section id="reviews">
+  <div class="section-header">
+    <div class="section-label">What People Say</div>
+    <h2>Guest <em>reviews</em></h2>
+  </div>
+  <div class="reviews-grid">
+    {% for r in info.reviews %}
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"{{ r.text }}"</p>
+        <div class="review-author">{{ r.author }}</div>
+        <div class="review-source">{{ r.source }}</div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{# ── Visit ── #}
+<section id="visit">
+  <div class="section-header">
+    <div class="section-label">Come Visit Us</div>
+    <h2>Hours &amp; <em>location</em></h2>
+  </div>
+  <div class="visit-grid">
+    <div class="hours-box">
+      {% for h in info.hours %}
+        <div class="hours-row {% if h.day == today %}today{% endif %}">
+          <span>{{ h.day }}{% if h.day == today %} — Today{% endif %}</span>
+          <span>{{ h.display }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="location-box">
+      <p>📍 {{ info.address }}</p>
+      <p>📞 <a href="tel:{{ info.phone_raw }}">{{ info.phone }}</a></p>
+      <p>✉️ <a href="mailto:{{ info.email }}">{{ info.email }}</a></p>
+      <p>🌿 {{ info.amenities | join(" · ") }}</p>
+      <a href="https://maps.google.com/?q={{ info.address | urlencode }}"
+         target="_blank" class="btn-primary" style="display:inline-block;margin-top:12px">
+        Get Directions →
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ── Pre-Order Form ── #}
+<section id="order-section">
+  <div class="section-header">
+    <div class="section-label">Skip the Wait</div>
+    <h2>Order <em>ahead</em></h2>
+  </div>
+  <p class="section-sub">Place your order — it'll be ready when you arrive. We'll confirm by phone.</p>
+
+  <form method="POST" action="{{ url_for('place_order') }}" class="order-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" name="name" placeholder="Paul" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" name="phone" placeholder="(203) 555-0100" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>What would you like?</label>
+      <select name="item" required>
+        <option value="">— Choose a drink or item —</option>
+        <optgroup label="Hot Espresso">
+          {% for item in menu.hot[:9] %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Hot Other">
+          {% for item in menu.hot[9:] %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Cold Drinks">
+          {% for item in menu.iced %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Pastries">
+          {% for item in menu.pastries %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Savory">
+          {% for item in menu.savory %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+        <optgroup label="Gelato">
+          {% for item in menu.gelato %}<option>{{ item.name }}</option>{% endfor %}
+        </optgroup>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Pickup Time</label>
+        <input type="time" name="pickup_time" min="08:00" max="19:45" required>
+      </div>
+      <div class="form-group">
+        <label>Special requests (optional)</label>
+        <input type="text" name="notes" placeholder="Oat milk, extra shot…">
+      </div>
+    </div>
+    <button type="submit">Place Order</button>
+  </form>
+</section>
+
+{# ── Newsletter Form ── #}
+<section id="newsletter">
+  <div class="section-header">
+    <div class="section-label">Stay in the Loop</div>
+    <h2>Weekly <em>specials</em></h2>
+  </div>
+  <p class="section-sub">New gelato flavors, seasonal drinks, and moments from the café — every Friday.</p>
+  <form method="POST" action="{{ url_for('subscribe') }}" class="newsletter-form">
+    <input type="email" name="email" placeholder="your@email.com" required>
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+{% endblock %}

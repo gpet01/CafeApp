@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Staff Portal — {{ info.name }}{% endblock %}
+
+{% block content %}
+<div class="members-container" style="max-width:420px">
+  <div class="brand-center">Café <span>Aroma</span></div>
+  <h1 class="page-title">Staff Portal</h1>
+
+  <form method="POST" action="{{ url_for('admin_login') }}">
+    <label>Email</label>
+    <input type="email" name="email" required autofocus>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <button type="submit">Enter</button>
+  </form>
+</div>
+{% endblock %}

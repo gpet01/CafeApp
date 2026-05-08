@@ -1,10 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ info.name }}{% endblock %}
 
-</body>
-</html>
+{% block content %}
+
+{# Stats row #}
+<div class="members-container">
+  <h1 class="page-title">Dashboard</h1>
+
+  <div class="home-cards">
+    <div class="home-card">
+      <h3>Orders Today</h3>
+      <p class="stats-number">{{ today_count }}</p>
+    </div>
+    <div class="home-card">
+      <h3>Pending</h3>
+      <p class="stats-number">{{ pending_count }}</p>
+    </div>
+    <div class="home-card">
+      <h3>Subscribers</h3>
+      <p class="stats-number">{{ subscribers | length }}</p>
+    </div>
+  </div>
+</div>
+
+{# Gelato updater #}
+<div class="members-container">
+  <h2 class="page-title" style="font-size:24px">Today's Gelato 🍦</h2>
+  <p style="text-align:center">Current: <strong>{{ gelato_flavors | join(", ") }}</strong></p>
+
+  <form method="POST" action="{{ url_for('update_gelato') }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0">
+      {% for i in range(1,5) %}
+        <div>
+          <label>Flavor {{ i }}{% if i == 4 %} (optional){% endif %}</label>
+          <input type="text" name="flavor_{{ i }}"
+                 value="{{ gelato_flavors[i-1] if i <= gelato_flavors|length else '' }}"
+                 placeholder="Flavor {{ i }}">
+        </div>
+      {% endfor %}
+    </div>
+    <button type="submit" style="margin-top:12px">Update Gelato</button>
+  </form>
+</div>
+
+{# Orders table #}
+<div class="members-container">
+  <h2 class="page-title" style="font-size:24px">Pre-Orders</h2>
+
+  {% if orders %}
+    <table class="members-table">
+      <thead class="table-header">
+        <tr>
+          <th class="header-cell">#</th>
+          <th class="header-cell">Name</th>
+          <th class="header-cell">Phone</th>
+          <th class="header-cell">Item</th>
+          <th class="header-cell">Pickup</th>
+          <th class="header-cell">Notes</th>
+          <th class="header-cell">Status</th>
+          <th class="header-cell">Action</th>
+        </tr>
+      </thead>
+      <tbody class="table-body">
+        {% for o in orders %}
+          <tr class="table-row">
+            <td class="table-cell">{{ o.id }}</td>
+            <td class="table-cell">{{ o.name }}</td>
+            <td class="table-cell"><a href="tel:{{ o.phone }}" class="action-btn" style="font-size:11px;padding:4px 8px">{{ o.phone }}</a></td>
+            <td class="table-cell">{{ o.item }}</td>
+            <td class="table-cell">{{ o.pickup_time }}</td>
+            <td class="table-cell">{{ o.notes or "—" }}</td>
+            <td class="table-cell">
+              <span class="status-pill status-{{ o.status }}">{{ o.status }}</span>
+            </td>
+            <td class="table-cell">
+              {% if o.status == "pending" %}
+                <form method="POST" action="{{ url_for('update_order', order_id=o.id, status='ready') }}" style="margin:0">
+                  <button type="submit" class="action-btn" style="border:none;cursor:pointer">Mark Ready</button>
+                </form>
+              {% elif o.status == "ready" %}
+                <form method="POST" action="{{ url_for('update_order', order_id=o.id, status='done') }}" style="margin:0">
+                  <button type="submit" class="action-btn" style="border:none;cursor:pointer;background:rgba(100,100,100,.3);color:#ccc">Done</button>
+                </form>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty-state">
+      <h2>No orders yet</h2>
+      <p>Pre-orders will appear here.</p>
+    </div>
+  {% endif %}
+</div>
+
+{# Subscribers table #}
+<div class="members-container">
+  <h2 class="page-title" style="font-size:24px">Newsletter Subscribers</h2>
+
+  {% if subscribers %}
+    <table class="members-table">
+      <thead class="table-header">
+        <tr>
+          <th class="header-cell">#</th>
+          <th class="header-cell">Email</th>
+          <th class="header-cell">Name</th>
+          <th class="header-cell">Date</th>
+        </tr>
+      </thead>
+      <tbody class="table-body">
+        {% for s in subscribers %}
+          <tr class="table-row">
+            <td class="table-cell">{{ loop.index }}</td>
+            <td class="table-cell">{{ s.email }}</td>
+            <td class="table-cell">{{ s.name or "—" }}</td>
+            <td class="table-cell">{{ s.created_at.strftime("%d %b %Y") }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty-state">
+      <h2>No subscribers yet</h2>
+      <p>Newsletter sign-ups will appear here.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Live clock in title
+  function tick() {
+    document.title = new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}) + " · Dashboard";
+  }
+  setInterval(tick, 1000);
+</script>
+{% endblock %}
