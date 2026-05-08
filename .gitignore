@@ -22,6 +22,9 @@ build/
 .DS_Store
 .AppleDouble
 
+# Claude Code
+.claude/
+
 # IDEs
 .idea/
 .vscode/
