@@ -15,6 +15,7 @@
           <nav class="nav-links">
             <a href="{{ url_for('home') }}#about">Our Story</a>
             <a href="{{ url_for('home') }}#menu">Menu</a>
+            <a href="{{ url_for('home') }}#reviews">Reviews</a>
             <a href="{{ url_for('home') }}#visit">Visit</a>
             {% if current_user.is_authenticated %}
               <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
@@ -48,6 +49,7 @@
           <div class="footer-links">
             <a href="{{ url_for('home') }}#about">Our Story</a>
             <a href="{{ url_for('home') }}#menu">Menu</a>
+            <a href="{{ url_for('home') }}#reviews">Reviews</a>
             <a href="{{ url_for('home') }}#visit">Visit</a>
             <a href="{{ url_for('admin_login') }}">Staff Portal</a>
           </div>

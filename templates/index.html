@@ -141,6 +141,16 @@
     <h2>Guest <em>reviews</em></h2>
   </div>
   <div class="reviews-grid">
+    {% for r in db_reviews %}
+      <div class="review-card">
+        <div class="review-stars">
+          {% for _ in range(r.rating) %}★{% endfor %}{% for _ in range(5 - r.rating) %}<span class="star-empty">★</span>{% endfor %}
+        </div>
+        <p class="review-text">"{{ r.text }}"</p>
+        <div class="review-author">{{ r.author }}</div>
+        <div class="review-source">Verified Guest</div>
+      </div>
+    {% endfor %}
     {% for r in info.reviews %}
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
@@ -150,6 +160,38 @@
       </div>
     {% endfor %}
   </div>
+</section>
+
+{# ── Leave a Review ── #}
+<section id="leave-review">
+  <div class="section-header">
+    <div class="section-label">Share Your Experience</div>
+    <h2>Leave a <em>review</em></h2>
+  </div>
+  <p class="section-sub">Your review will appear after a quick approval. ☕</p>
+
+  <form method="POST" action="{{ url_for('submit_review') }}" class="review-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" name="author" placeholder="Maria K." required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="star-rating">
+          {% for i in [5,4,3,2,1] %}
+            <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" required>
+            <label for="star{{ i }}" title="{{ i }} stars">★</label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Your Review</label>
+      <textarea name="text" placeholder="The freddo espresso was absolutely perfect…" required maxlength="600" rows="4"></textarea>
+    </div>
+    <button type="submit">Submit Review</button>
+  </form>
 </section>
 
 {# ── Visit ── #}
@@ -198,6 +240,10 @@
         <label>Phone Number</label>
         <input type="tel" name="phone" placeholder="(203) 555-0100" required>
       </div>
+    </div>
+    <div class="form-group">
+      <label>Email <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(optional — we'll notify you when ready)</span></label>
+      <input type="email" name="email" placeholder="your@email.com">
     </div>
     <div class="form-group">
       <label>What would you like?</label>

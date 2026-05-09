@@ -9,8 +9,9 @@ load_dotenv()
 
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime, Boolean
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -27,6 +28,16 @@ class Base(DeclarativeBase):
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///cafe_aroma.db")
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+# ── Mail ──────────────────────────────────────────────────────────────────────
+
+app.config["MAIL_SERVER"]   = os.getenv("MAIL_SERVER",   "smtp.gmail.com")
+app.config["MAIL_PORT"]     = int(os.getenv("MAIL_PORT", "587"))
+app.config["MAIL_USE_TLS"]  = os.getenv("MAIL_USE_TLS",  "true").lower() == "true"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME", "")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD", "")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_SENDER", "Café Aroma 55 <noreply@cafearoma55.com>")
+mail = Mail(app)
 
 # ── Flask-Login ───────────────────────────────────────────────────────────────
 
@@ -52,10 +63,12 @@ class Order(db.Model):
     id:          Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name:        Mapped[str] = mapped_column(String(255), nullable=False)
     phone:       Mapped[str] = mapped_column(String(50),  nullable=False)
+    email:       Mapped[str] = mapped_column(String(255), nullable=True)
     item:        Mapped[str] = mapped_column(String(255), nullable=False)
     pickup_time: Mapped[str] = mapped_column(String(20),  nullable=False)
     notes:       Mapped[str] = mapped_column(String(500), nullable=True)
     status:      Mapped[str] = mapped_column(String(20),  default="pending")
+    hidden:      Mapped[bool] = mapped_column(Boolean,    default=False)
     created_at:  Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.datetime.now(datetime.timezone.utc)
@@ -78,6 +91,19 @@ class GelatoFlavor(db.Model):
     id:         Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     flavors:    Mapped[str] = mapped_column(String(500), nullable=False)
     updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc)
+    )
+
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+    id:         Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    author:     Mapped[str] = mapped_column(String(100), nullable=False)
+    rating:     Mapped[int] = mapped_column(Integer, nullable=False)
+    text:       Mapped[str] = mapped_column(String(600), nullable=False)
+    status:     Mapped[str] = mapped_column(String(20), default="pending")
+    created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.datetime.now(datetime.timezone.utc)
     )
@@ -137,15 +163,22 @@ with app.app_context():
 
 @app.route("/")
 def home():
+    approved = db.session.execute(
+        db.select(Review)
+          .where(Review.status == "approved")
+          .order_by(Review.created_at.desc())
+    ).scalars().all()
     return render_template("index.html",
                            menu=load_menu(),
-                           gelato=get_gelato())
+                           gelato=get_gelato(),
+                           db_reviews=approved)
 
 
 @app.route("/order", methods=["POST"])
 def place_order():
     name        = request.form.get("name", "").strip()
     phone       = request.form.get("phone", "").strip()
+    email       = request.form.get("email", "").strip() or None
     item        = request.form.get("item", "").strip()
     pickup_time = request.form.get("pickup_time", "").strip()
     notes       = request.form.get("notes", "").strip()
@@ -154,11 +187,35 @@ def place_order():
         flash("Please fill in all required fields.", "error")
         return redirect(url_for("home") + "#order-modal")
 
-    db.session.add(Order(name=name, phone=phone, item=item,
+    db.session.add(Order(name=name, phone=phone, email=email, item=item,
                          pickup_time=pickup_time, notes=notes))
     db.session.commit()
     flash(f"Order received! See you at {pickup_time}, {name}! ☕", "success")
     return redirect(url_for("home"))
+
+
+@app.route("/review", methods=["POST"])
+def submit_review():
+    author     = request.form.get("author", "").strip()
+    text       = request.form.get("text",   "").strip()
+    rating_raw = request.form.get("rating", "").strip()
+
+    if not all([author, text, rating_raw]):
+        flash("Please fill in all fields.", "error")
+        return redirect(url_for("home") + "#leave-review")
+
+    try:
+        rating = int(rating_raw)
+        if not 1 <= rating <= 5:
+            raise ValueError
+    except ValueError:
+        flash("Please select a star rating.", "error")
+        return redirect(url_for("home") + "#leave-review")
+
+    db.session.add(Review(author=author, rating=rating, text=text))
+    db.session.commit()
+    flash("Thank you! Your review will appear once approved. ☕", "success")
+    return redirect(url_for("home") + "#reviews")
 
 
 @app.route("/newsletter", methods=["POST"])
@@ -219,24 +276,33 @@ def admin_logout():
 @app.route("/admin")
 @login_required
 def admin_dashboard():
-    orders      = db.session.execute(
+    all_orders  = db.session.execute(
         db.select(Order).order_by(Order.created_at.desc())
     ).scalars().all()
+
+    orders = [o for o in all_orders if not o.hidden]
 
     subscribers = db.session.execute(
         db.select(Newsletter).order_by(Newsletter.created_at.desc())
     ).scalars().all()
 
-    today_str      = datetime.date.today().isoformat()
-    today_orders   = [o for o in orders if o.created_at.date().isoformat() == today_str]
-    pending_orders = [o for o in orders if o.status == "pending"]
+    reviews = db.session.execute(
+        db.select(Review).order_by(Review.created_at.desc())
+    ).scalars().all()
+
+    today_str        = datetime.date.today().isoformat()
+    today_orders     = [o for o in all_orders if o.created_at.date().isoformat() == today_str]
+    pending_orders   = [o for o in orders if o.status == "pending"]
+    pending_reviews  = [r for r in reviews if r.status == "pending"]
 
     return render_template("admin.html",
                            orders=orders,
                            subscribers=subscribers,
+                           reviews=reviews,
                            gelato_flavors=get_gelato(),
                            today_count=len(today_orders),
-                           pending_count=len(pending_orders))
+                           pending_count=len(pending_orders),
+                           pending_reviews_count=len(pending_reviews))
 
 
 @app.route("/admin/gelato", methods=["POST"])
@@ -254,6 +320,96 @@ def update_gelato():
     return redirect(url_for("admin_dashboard"))
 
 
+@app.route("/admin/order/<int:order_id>/delete", methods=["POST"])
+@login_required
+def delete_order(order_id):
+    order = db.session.get(Order, order_id)
+    if not order:
+        abort(404)
+    order.hidden = True
+    db.session.commit()
+    flash(f"Order #{order_id} removed from panel.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/review/<int:review_id>/approve", methods=["POST"])
+@login_required
+def approve_review(review_id):
+    review = db.session.get(Review, review_id)
+    if not review:
+        abort(404)
+    review.status = "approved"
+    db.session.commit()
+    flash(f"Review by {review.author} approved. ✓", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/review/<int:review_id>/reject", methods=["POST"])
+@login_required
+def reject_review(review_id):
+    review = db.session.get(Review, review_id)
+    if not review:
+        abort(404)
+    db.session.delete(review)
+    db.session.commit()
+    flash("Review removed.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+def send_ready_email(order):
+    """Send a 'your order is ready' email to the customer."""
+    if not order.email:
+        return
+    try:
+        html = f"""
+        <div style="font-family:'Georgia',serif;max-width:520px;margin:auto;
+                    background:#1f1510;color:#f0e8d8;border-radius:12px;
+                    overflow:hidden;border:1px solid rgba(196,145,58,.2)">
+          <div style="background:linear-gradient(90deg,#c4913a,#d4a44a);
+                      padding:28px 32px;text-align:center">
+            <h1 style="margin:0;font-weight:300;font-size:26px;color:#1f1510;letter-spacing:.04em">
+              Café Aroma 55
+            </h1>
+          </div>
+          <div style="padding:32px">
+            <p style="font-size:18px;color:#f0e8d8;margin:0 0 12px">
+              Hey <strong>{order.name}</strong>! ☕
+            </p>
+            <p style="font-size:16px;color:#c4913a;font-weight:500;margin:0 0 24px">
+              Your order is ready for pickup!
+            </p>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(196,145,58,.15);
+                        border-radius:8px;padding:16px 20px;margin-bottom:24px">
+              <p style="margin:0 0 6px;color:#94826a;font-size:12px;
+                        text-transform:uppercase;letter-spacing:.1em">Your Order</p>
+              <p style="margin:0;color:#f0e8d8;font-size:16px">{order.item}</p>
+              <p style="margin:6px 0 0;color:#94826a;font-size:13px">
+                Pickup time: <strong style="color:#f0e8d8">{order.pickup_time}</strong>
+              </p>
+            </div>
+            <p style="color:#94826a;font-size:14px;margin:0">
+              We're at <strong style="color:#f0e8d8">55 Wall St, Norwalk CT</strong>.
+              See you soon!
+            </p>
+          </div>
+          <div style="padding:16px 32px;border-top:1px solid rgba(196,145,58,.1);
+                      text-align:center">
+            <p style="margin:0;color:#5a4a38;font-size:12px">
+              © Café Aroma 55 · (203) 354-0677
+            </p>
+          </div>
+        </div>
+        """
+        msg = Message(
+            subject="Your order is ready! ☕ — Café Aroma 55",
+            recipients=[order.email],
+            html=html
+        )
+        mail.send(msg)
+    except Exception as e:
+        app.logger.warning(f"Could not send ready email for order #{order.id}: {e}")
+
+
 @app.route("/admin/order/<int:order_id>/<string:status>", methods=["POST"])
 @login_required
 def update_order(order_id, status):
@@ -264,6 +420,8 @@ def update_order(order_id, status):
         abort(404)
     order.status = status
     db.session.commit()
+    if status == "ready":
+        send_ready_email(order)
     flash(f"Order #{order_id} marked as {status}.", "success")
     return redirect(url_for("admin_dashboard"))
 
