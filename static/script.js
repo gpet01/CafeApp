@@ -48,3 +48,23 @@ window.addEventListener("scroll", () => {
       : "rgba(196,145,58,0.15)";
   }
 });
+
+// ── Hamburger menu ────────────────────────────────────────────────────────────
+
+const hamburger = document.getElementById("hamburger");
+const navLinks  = document.getElementById("nav-links");
+
+if (hamburger && navLinks) {
+  hamburger.addEventListener("click", () => {
+    hamburger.classList.toggle("open");
+    navLinks.classList.toggle("open");
+  });
+
+  // Close menu when a link is clicked
+  navLinks.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      hamburger.classList.remove("open");
+      navLinks.classList.remove("open");
+    });
+  });
+}

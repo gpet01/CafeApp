@@ -2,16 +2,18 @@
 {% block title %}Staff Portal — {{ info.name }}{% endblock %}
 
 {% block content %}
-<div class="members-container" style="max-width:420px">
-  <div class="brand-center">Café <span>Aroma</span></div>
-  <h1 class="page-title">Staff Portal</h1>
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="brand-center">Café <span>Aroma</span></div>
+    <p class="login-sub">Staff Portal</p>
 
-  <form method="POST" action="{{ url_for('admin_login') }}">
-    <label>Email</label>
-    <input type="email" name="email" required autofocus>
-    <label>Password</label>
-    <input type="password" name="password" required>
-    <button type="submit">Enter</button>
-  </form>
+    <form method="POST" action="{{ url_for('admin_login') }}" class="login-form">
+      <label>Email</label>
+      <input type="email" name="email" required autofocus autocomplete="email">
+      <label>Password</label>
+      <input type="password" name="password" required autocomplete="current-password">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
 </div>
 {% endblock %}
